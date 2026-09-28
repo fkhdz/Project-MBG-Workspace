@@ -9,7 +9,7 @@ if (!$koneksi_db) {
     die("<div style='padding:2rem; font-family:sans-serif;'><h3 style='color:red;'>Koneksi Gagal!</h3><p>Pastikan file <code>config/koneksi.php</code> ada.</p></div>");
 }
 
-// Statistik dashboard
+
 $stats_penerima       = (int)(mysqli_fetch_assoc(mysqli_query($koneksi_db, "SELECT COUNT(*) as total FROM PENERIMA"))['total'] ?? 0);
 $jumlah_selesai       = (int)(mysqli_fetch_assoc(mysqli_query($koneksi_db, "SELECT COUNT(*) as total FROM DISTRIBUSI WHERE status_pengiriman IN ('Selesai','Terkirim','Diterima')"))['total'] ?? 0);
 $stats_pending        = (int)(mysqli_fetch_assoc(mysqli_query($koneksi_db, "SELECT COUNT(*) as total FROM DISTRIBUSI WHERE status_pengiriman IN ('Pending','Diproses','Gagal','Retur')"))['total'] ?? 0);
@@ -32,7 +32,6 @@ include "includes/header.php";
 <main class="flex-1 min-w-0">
     <div class="px-5 sm:px-8 lg:px-10 py-6 lg:py-8 max-w-[1400px] mx-auto">
 
-        <!-- Hero / Sambutan -->
         <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
                 <p class="text-xs font-bold text-primary-600 uppercase tracking-widest mb-2">Dashboard Utama</p>
@@ -54,9 +53,7 @@ include "includes/header.php";
             </div>
         </div>
 
-        <!-- Statistik Cards -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <!-- Card: Total Penerima -->
             <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100 hover:border-primary-200 transition-all">
                 <div class="flex items-center justify-between mb-4">
                     <div class="size-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -68,7 +65,6 @@ include "includes/header.php";
                 <p class="text-xs text-slate-500 mt-1">Total penerima aktif terdaftar</p>
             </div>
 
-            <!-- Card: Distribusi Sukses -->
             <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100 hover:border-emerald-200 transition-all">
                 <div class="flex items-center justify-between mb-4">
                     <div class="size-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -80,7 +76,6 @@ include "includes/header.php";
                 <p class="text-xs text-slate-500 mt-1">Distribusi telah diterima</p>
             </div>
 
-            <!-- Card: Menunggu Tindakan -->
             <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100 hover:border-amber-200 transition-all">
                 <div class="flex items-center justify-between mb-4">
                     <div class="size-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
@@ -97,7 +92,6 @@ include "includes/header.php";
                 <p class="text-xs text-slate-500 mt-1">Menunggu tindakan</p>
             </div>
 
-            <!-- Card: Total Mitra -->
             <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100 hover:border-purple-200 transition-all">
                 <div class="flex items-center justify-between mb-4">
                     <div class="size-11 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
@@ -110,9 +104,7 @@ include "includes/header.php";
             </div>
         </div>
 
-        <!-- Modul Sistem + Aktivitas -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Kolom Kiri (2/3) -->
             <div class="lg:col-span-2 space-y-6">
                 <div>
                     <div class="flex items-center justify-between mb-4">
@@ -156,7 +148,6 @@ include "includes/header.php";
                 </div>
             </div>
 
-            <!-- Kolom Kanan (1/3): Aktivitas -->
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-6 lg:sticky lg:top-6">
                     <div class="flex items-center justify-between mb-5">
