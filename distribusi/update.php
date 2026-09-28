@@ -1,288 +1,210 @@
 <?php
-// 1. Integrasi Koneksi Database
-include '../config/koneksi.php';
+include "../config/koneksi.php";
 
-// Fix variabel koneksi
 $koneksi_db = null;
-if (isset($conn)) {
-    $koneksi_db = $conn;
-} elseif (isset($koneksi)) {
-    $koneksi_db = $koneksi;
-}
+if (isset($conn)) $koneksi_db = $conn;
+elseif (isset($koneksi)) $koneksi_db = $koneksi;
 
 if (!$koneksi_db) {
     die("Error: Variabel koneksi database tidak ditemukan.");
 }
 
-// 2. Ambil ID & Data Lama
 if (!isset($_GET['id'])) {
     header("Location: index.php");
     exit;
 }
-
-$distribusi_id = $_GET['id'];
-$query_data = mysqli_query($koneksi_db, "SELECT * FROM DISTRIBUSI WHERE distribusi_id = '$distribusi_id'");
-$row = mysqli_fetch_assoc($query_data);
+$id = $_GET['id'];
+$q  = mysqli_query($koneksi_db, "SELECT * FROM DISTRIBUSI WHERE distribusi_id='$id'");
+$row = mysqli_fetch_assoc($q);
 
 if (!$row) {
     echo "<script>alert('Data tidak ditemukan!'); window.location='index.php';</script>";
     exit;
 }
 
-// 3. Proses Update Data
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     $paket_id       = $_POST['paket_id'];
     $penerima_id    = $_POST['penerima_id'];
     $mitra_id       = $_POST['mitra_id'];
     $tanggal_kirim  = $_POST['tanggal_kirim'];
-    $tanggal_terima = $_POST['tanggal_terima'];
+    $tanggal_terima = $_POST['tanggal_terima'] ?: null;
     $lokasi         = $_POST['lokasi_pengiriman'];
     $status         = $_POST['status_pengiriman'];
-    $catatan        = $_POST['catatan_petugas'];
+    $catatan        = $_POST['catatan_petugas'] ?? '';
 
-    // Handle File Upload
-    $bukti_nama = $_FILES['bukti_pengiriman']['name'];
+    $tanggal_terima_sql = $tanggal_terima ? "'$tanggal_terima'" : "NULL";
 
-    if ($bukti_nama != "") {
-        $tmp    = $_FILES['bukti_pengiriman']['tmp_name'];
-        $folder = "../uploads/";
-
-        // Buat folder jika belum ada
-        if (!is_dir($folder)) {
-            mkdir($folder, 0777, true);
-        }
-
-        $nama_baru = time() . "_" . $bukti_nama;
-        
-        if (move_uploaded_file($tmp, $folder . $nama_baru)) {
-            // Hapus file lama jika ada dan file baru berhasil diupload
-            if ($row['bukti_pengiriman'] != "" && file_exists($folder . $row['bukti_pengiriman'])) {
-                unlink($folder . $row['bukti_pengiriman']);
-            }
-            $bukti_final = $nama_baru;
-        } else {
-            // Fallback jika gagal upload
-            $bukti_final = $row['bukti_pengiriman'];
-        }
-    } else {
-        $bukti_final = $row['bukti_pengiriman']; // Tetap pakai yang lama
-    }
-
-    $query_update = "UPDATE DISTRIBUSI SET 
-                paket_id = '$paket_id',
-                penerima_id = '$penerima_id',
-                mitra_id = '$mitra_id',
-                tanggal_kirim = '$tanggal_kirim',
-                tanggal_terima = '$tanggal_terima',
+    $upd = "UPDATE DISTRIBUSI SET
+                paket_id        = '$paket_id',
+                penerima_id     = '$penerima_id',
+                mitra_id        = '$mitra_id',
+                tanggal_kirim   = '$tanggal_kirim',
+                tanggal_terima  = $tanggal_terima_sql,
                 lokasi_pengiriman = '$lokasi',
                 status_pengiriman = '$status',
-                bukti_pengiriman = '$bukti_final',
                 catatan_petugas = '$catatan'
-              WHERE distribusi_id = '$distribusi_id'";
+            WHERE distribusi_id = '$id'";
 
-    if (mysqli_query($koneksi_db, $query_update)) {
-        echo "<script>alert('Data distribusi berhasil diperbarui'); window.location='index.php';</script>";
+    if (mysqli_query($koneksi_db, $upd)) {
+        header("Location: index.php?msg=updated");
         exit;
     } else {
-        echo "<script>alert('Gagal update data: " . mysqli_error($koneksi_db) . "');</script>";
+        $error_msg = "Gagal update: " . mysqli_error($koneksi_db);
     }
 }
+
+$current_page = 'distribusi';
+$page_title   = 'Edit Distribusi';
+include "../includes/header.php";
 ?>
+<div class="flex min-h-screen w-full">
+<?php include "../sidebar.php"; ?>
 
-<!DOCTYPE html>
-<html class="light" lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Edit Distribusi</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-<script>
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            "primary": "#137fec",
-            "background-light": "#f6f7f8",
-            "background-dark": "#101922",
-          },
-          fontFamily: {
-            "display": ["Inter", "sans-serif"]
-          },
-          borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
-        },
-      },
-    }
-</script>
-<style>
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-</style>
-</head>
-<body class="bg-background-light dark:bg-background-dark font-display">
-<div class="relative flex min-h-screen w-full flex-col">
-<div class="flex h-full w-full">
+<main class="flex-1 min-w-0">
+    <div class="px-5 sm:px-8 lg:px-10 py-6 lg:py-8 max-w-4xl mx-auto w-full">
 
-<aside class="w-64 flex-shrink-0 bg-white dark:bg-background-dark dark:border-r dark:border-gray-700 hidden lg:flex flex-col">
-    <div class="flex h-full flex-col justify-between p-4">
-        <div class="flex flex-col gap-4">
-            <div class="flex items-center gap-3 p-2">
-                <div class="bg-primary rounded-lg flex items-center justify-center size-10">
-                    <span class="material-symbols-outlined text-white text-2xl">all_inbox</span>
-                </div>
-                <h1 class="text-xl font-bold text-[#111418] dark:text-white">AidFlow</h1>
-            </div>
-            <div class="flex flex-col gap-2 pt-4">
-                <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800" href="../index.php">
-                    <span class="material-symbols-outlined">dashboard</span>
-                    <p class="text-sm font-medium">Dashboard</p>
-                </a>
-                <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800" href="../mitra/index.php">
-                    <span class="material-symbols-outlined">handshake</span>
-                    <p class="text-sm font-medium">Mitra</p>
-                </a>
-                <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800" href="../user/index.php">
-                    <span class="material-symbols-outlined">person</span>
-                    <p class="text-sm font-medium">Pengguna</p>
-                </a>
-                <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800" href="../penerima/index.php">
-                    <span class="material-symbols-outlined">group</span>
-                    <p class="text-sm font-medium">Penerima</p>
-                </a>
-                <a class="flex items-center gap-3 rounded-lg bg-primary/10 px-3 py-2 text-primary dark:bg-primary/20 dark:text-white" href="index.php">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
-                    <p class="text-sm font-medium">Distribusi</p>
-                </a>
-            </div>
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-sm mb-2">
+            <a href="index.php" class="text-slate-500 hover:text-primary-600 font-medium transition-colors">Distribusi</a>
+            <span class="text-slate-300">/</span>
+            <span class="text-slate-700 font-semibold">Edit Distribusi #<?= $row['distribusi_id'] ?></span>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Edit Data Distribusi</h2>
+            <p class="text-slate-500 mt-1.5 text-sm">Perbarui informasi distribusi bantuan.</p>
         </div>
-    </div>
-</aside>
 
-<main class="flex-1 p-6 lg:p-10">
-<div class="mx-auto max-w-4xl">
-    <div class="flex flex-wrap gap-2 pb-4">
-        <a class="text-sm font-medium text-[#617589] dark:text-gray-400 hover:text-primary" href="index.php">Distribusi</a>
-        <span class="text-sm font-medium text-[#617589] dark:text-gray-400">/</span>
-        <span class="text-sm font-medium text-[#111418] dark:text-white">Edit Distribusi</span>
-    </div>
+        <!-- Error -->
+        <?php if (isset($error_msg)): ?>
+        <div class="mb-6 p-4 bg-red-50 text-red-700 rounded-xl border border-red-100 shadow-sm flex items-center gap-3">
+            <span class="material-symbols-outlined text-red-500">error</span>
+            <p class="text-sm font-semibold"><?= htmlspecialchars($error_msg) ?></p>
+        </div>
+        <?php endif; ?>
 
-    <div class="flex flex-wrap items-center justify-between gap-3 pb-6">
-        <p class="text-3xl font-bold text-[#111418] dark:text-white">Edit Distribusi</p>
-    </div>
+        <!-- Form Card -->
+        <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-6 sm:p-8">
+            <form action="" method="POST" enctype="multipart/form-data">
+                <div class="space-y-6">
 
-    <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-background-dark/50">
-        
-        <form method="POST" enctype="multipart/form-data" class="space-y-6">
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                
-                <label class="flex flex-col md:col-span-2">
-                    <p class="pb-2 text-sm font-medium text-[#111418] dark:text-gray-200">Paket Bantuan</p>
-                    <select name="paket_id" class="form-select w-full rounded-lg border-[#dbe0e6] bg-white text-base text-[#111418] focus:border-primary focus:ring-primary/50 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
-                        <?php
-                        $paket = mysqli_query($koneksi_db, "SELECT * FROM PAKETBANTUAN");
-                        while ($p = mysqli_fetch_assoc($paket)) {
-                            $selected = ($p['paket_id'] == $row['paket_id']) ? "selected" : "";
-                            echo "<option value='{$p['paket_id']}' $selected>{$p['nama_paket']}</option>";
-                        }
-                        ?>
-                    </select>
-                </label>
-
-                <label class="flex flex-col">
-                    <p class="pb-2 text-sm font-medium text-[#111418] dark:text-gray-200">Penerima</p>
-                    <select name="penerima_id" class="form-select w-full rounded-lg border-[#dbe0e6] bg-white text-base text-[#111418] focus:border-primary focus:ring-primary/50 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
-                        <?php
-                        $penerima = mysqli_query($koneksi_db, "SELECT * FROM PENERIMA");
-                        while ($pr = mysqli_fetch_assoc($penerima)) {
-                            $selected = ($pr['penerima_id'] == $row['penerima_id']) ? "selected" : "";
-                            echo "<option value='{$pr['penerima_id']}' $selected>{$pr['nama_lengkap']}</option>";
-                        }
-                        ?>
-                    </select>
-                </label>
-
-                <label class="flex flex-col">
-                    <p class="pb-2 text-sm font-medium text-[#111418] dark:text-gray-200">Mitra</p>
-                    <select name="mitra_id" class="form-select w-full rounded-lg border-[#dbe0e6] bg-white text-base text-[#111418] focus:border-primary focus:ring-primary/50 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
-                        <?php
-                        $mitra = mysqli_query($koneksi_db, "SELECT * FROM MITRA");
-                        while ($m = mysqli_fetch_assoc($mitra)) {
-                            $selected = ($m['mitra_id'] == $row['mitra_id']) ? "selected" : "";
-                            echo "<option value='{$m['mitra_id']}' $selected>{$m['nama_mitra']}</option>";
-                        }
-                        ?>
-                    </select>
-                </label>
-
-                <label class="flex flex-col md:col-span-2">
-                    <p class="pb-2 text-sm font-medium text-[#111418] dark:text-gray-200">Status Pengiriman</p>
-                    <select name="status_pengiriman" class="form-select w-full rounded-lg border-[#dbe0e6] bg-white text-base text-[#111418] focus:border-primary focus:ring-primary/50 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
-                        <?php
-                        $status_opsi = ["Dikemas", "Dikirim", "Diterima", "Selesai", "Gagal"];
-                        foreach ($status_opsi as $s) {
-                            $selected = ($row['status_pengiriman'] == $s) ? "selected" : "";
-                            echo "<option value='$s' $selected>$s</option>";
-                        }
-                        ?>
-                    </select>
-                </label>
-
-                <label class="flex flex-col">
-                    <p class="pb-2 text-sm font-medium text-[#111418] dark:text-gray-200">Tanggal Kirim</p>
-                    <input type="date" name="tanggal_kirim" value="<?= $row['tanggal_kirim'] ?>" class="form-input w-full rounded-lg border-[#dbe0e6] bg-white text-base text-[#111418] focus:border-primary focus:ring-primary/50 dark:border-gray-600 dark:bg-gray-800 dark:text-white" />
-                </label>
-
-                <label class="flex flex-col">
-                    <p class="pb-2 text-sm font-medium text-[#111418] dark:text-gray-200">Tanggal Terima</p>
-                    <input type="date" name="tanggal_terima" value="<?= $row['tanggal_terima'] ?>" class="form-input w-full rounded-lg border-[#dbe0e6] bg-white text-base text-[#111418] focus:border-primary focus:ring-primary/50 dark:border-gray-600 dark:bg-gray-800 dark:text-white" />
-                </label>
-
-                <label class="flex flex-col md:col-span-2">
-                    <p class="pb-2 text-sm font-medium text-[#111418] dark:text-gray-200">Lokasi Pengiriman</p>
-                    <input type="text" name="lokasi_pengiriman" value="<?= htmlspecialchars($row['lokasi_pengiriman']) ?>" class="form-input w-full rounded-lg border-[#dbe0e6] bg-white text-base text-[#111418] focus:border-primary focus:ring-primary/50 dark:border-gray-600 dark:bg-gray-800 dark:text-white" />
-                </label>
-
-                <div class="md:col-span-2">
-                    <p class="pb-2 text-sm font-medium text-[#111418] dark:text-gray-200">Bukti Pengiriman</p>
-                    
-                    <?php if (!empty($row['bukti_pengiriman'])): ?>
-                        <div class="mb-4">
-                            <p class="text-xs text-gray-500 mb-1">File saat ini:</p>
-                            
-                            <img src="../uploads/<?= $row['bukti_pengiriman'] ?>" alt="Bukti Lama" class="h-32 rounded-lg border border-gray-300 object-cover">
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="flex flex-col items-center gap-4 rounded-lg border-2 border-dashed border-gray-300 p-6 dark:border-gray-600">
-                        <div class="text-center">
-                            <span class="material-symbols-outlined text-4xl text-gray-400">cloud_upload</span>
-                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Klik tombol di bawah untuk mengganti foto (Opsional)</p>
-                            <input class="mt-4 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" id="file-upload" name="bukti_pengiriman" type="file" accept="image/*"/>
+                    <!-- Paket -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">
+                            Paket Bantuan <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <select name="paket_id" required class="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all appearance-none cursor-pointer">
+                                <option value="">-- Pilih Paket --</option>
+                                <?php
+                                $paket_q = mysqli_query($koneksi_db, "SELECT * FROM PAKETBANTUAN ORDER BY nama_paket ASC");
+                                while ($p = mysqli_fetch_assoc($paket_q)):
+                                    $sel = ($p['paket_id'] == $row['paket_id']) ? 'selected' : '';
+                                    echo "<option value='{$p['paket_id']}' $sel>" . htmlspecialchars($p['nama_paket']) . " - " . htmlspecialchars($p['jenis_bantuan']) . "</option>";
+                                endwhile;
+                                ?>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
                         </div>
                     </div>
+
+                    <!-- Penerima & Mitra -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Penerima <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <select name="penerima_id" required class="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all appearance-none cursor-pointer">
+                                    <option value="">-- Pilih Penerima --</option>
+                                    <?php
+                                    $penerima_q = mysqli_query($koneksi_db, "SELECT * FROM PENERIMA ORDER BY nama_lengkap ASC");
+                                    while ($r = mysqli_fetch_assoc($penerima_q)):
+                                        $sel = ($r['penerima_id'] == $row['penerima_id']) ? 'selected' : '';
+                                        echo "<option value='{$r['penerima_id']}' $sel>" . htmlspecialchars($r['nama_lengkap']) . "</option>";
+                                    endwhile;
+                                    ?>
+                                </select>
+                                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Mitra Penyalur <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <select name="mitra_id" required class="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all appearance-none cursor-pointer">
+                                    <option value="">-- Pilih Mitra --</option>
+                                    <?php
+                                    $mitra_q = mysqli_query($koneksi_db, "SELECT * FROM MITRA ORDER BY nama_mitra ASC");
+                                    while ($m = mysqli_fetch_assoc($mitra_q)):
+                                        $sel = ($m['mitra_id'] == $row['mitra_id']) ? 'selected' : '';
+                                        echo "<option value='{$m['mitra_id']}' $sel>" . htmlspecialchars($m['nama_mitra']) . "</option>";
+                                    endwhile;
+                                    ?>
+                                </select>
+                                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tanggal -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Tanggal Kirim <span class="text-red-500">*</span></label>
+                            <input type="date" name="tanggal_kirim" required value="<?= $row['tanggal_kirim'] ?>"
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Tanggal Terima <span class="text-slate-400 font-normal">(Opsional)</span></label>
+                            <input type="date" name="tanggal_terima" value="<?= $row['tanggal_terima'] ?>"
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all" />
+                        </div>
+                    </div>
+
+                    <!-- Lokasi -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Lokasi Pengiriman <span class="text-red-500">*</span></label>
+                        <input type="text" name="lokasi_pengiriman" required value="<?= htmlspecialchars($row['lokasi_pengiriman']) ?>"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all" />
+                    </div>
+
+                    <!-- Status -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Status Pengiriman <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <select name="status_pengiriman" required class="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all appearance-none cursor-pointer">
+                                <?php
+                                $status_opsi = ["Dikemas","Pending","Proses","Dikirim","Terkirim","Selesai","Gagal"];
+                                foreach ($status_opsi as $s):
+                                    $sel = ($row['status_pengiriman'] == $s) ? 'selected' : '';
+                                    echo "<option value='$s' $sel>$s</option>";
+                                endforeach;
+                                ?>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+                        </div>
+                    </div>
+
+                    <!-- Catatan -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Catatan Petugas <span class="text-slate-400 font-normal">(Opsional)</span></label>
+                        <textarea name="catatan_petugas" rows="3" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all resize-none"><?= htmlspecialchars($row['catatan_petugas']) ?></textarea>
+                    </div>
+
                 </div>
 
-                <label class="flex flex-col md:col-span-2">
-                    <p class="pb-2 text-sm font-medium text-[#111418] dark:text-gray-200">Catatan Petugas</p>
-                    <textarea name="catatan_petugas" class="form-textarea w-full rounded-lg border-[#dbe0e6] bg-white text-base text-[#111418] focus:border-primary focus:ring-primary/50 dark:border-gray-600 dark:bg-gray-800 dark:text-white" rows="4"><?= htmlspecialchars($row['catatan_petugas']) ?></textarea>
-                </label>
-            </div>
-
-            <div class="flex items-center justify-end gap-4 pt-4">
-                <a href="index.php" class="rounded-lg bg-gray-100 px-5 py-2.5 text-sm font-medium text-[#111418] hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
-                    Kembali
-                </a>
-                <button type="submit" class="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary/90">
-                    Simpan Perubahan
-                </button>
-            </div>
-        </form>
+                <!-- Action Buttons -->
+                <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3">
+                    <a href="index.php" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shadow-sm">
+                        Batal
+                    </a>
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-all shadow-sm hover:shadow-glow">
+                        <span class="material-symbols-outlined text-[18px]">save</span>
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
         </div>
-</div>
+    </div>
 </main>
-</div>
 </div>
 </body>
 </html>

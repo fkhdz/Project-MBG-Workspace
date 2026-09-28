@@ -1,7 +1,13 @@
 <?php
 include "../config/koneksi.php";
+
+if (!isset($_GET['id'])) { header("Location: index.php"); exit; }
 $id = $_GET['id'];
 
-mysqli_query($conn, "DELETE FROM USER WHERE user_id=$id");
-echo "<script>alert('User berhasil dihapus'); window.location='index.php';</script>";
+if (mysqli_query($conn, "DELETE FROM USER WHERE user_id='$id'")) {
+    header("Location: index.php?msg=deleted");
+} else {
+    header("Location: index.php?msg=error");
+}
+exit;
 ?>

@@ -1,8 +1,16 @@
 <?php
 include "../config/koneksi.php";
+
+if (!isset($_GET['id'])) {
+    header("Location: index.php");
+    exit;
+}
 $id = $_GET['id'];
 
-// Perhatikan: Menghapus penerima tidak menghapus User (Parent)
-mysqli_query($conn, "DELETE FROM PENERIMA WHERE penerima_id=$id");
-echo "<script>alert('Data penerima berhasil dihapus'); window.location='index.php';</script>";
+if (mysqli_query($conn, "DELETE FROM PENERIMA WHERE penerima_id='$id'")) {
+    header("Location: index.php?msg=deleted");
+} else {
+    header("Location: index.php?msg=error");
+}
+exit;
 ?>

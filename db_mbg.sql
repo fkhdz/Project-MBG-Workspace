@@ -99,3 +99,25 @@ CREATE TABLE LAPORANDATA (
     FOREIGN KEY (distribusi_id) REFERENCES DISTRIBUSI(distribusi_id),
     FOREIGN KEY (dibuat_oleh) REFERENCES USER(user_id)
 );
+
+-- ============================
+-- TABLE: ITEM (Gudang)
+-- ============================
+CREATE TABLE ITEM (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    nama_item VARCHAR(100) NOT NULL,
+    satuan VARCHAR(50),
+    stok_gudang INT DEFAULT 0
+);
+
+-- ============================
+-- TABLE: DETAIL_PAKET (Komposisi)
+-- ============================
+CREATE TABLE DETAIL_PAKET (
+    detail_id INT AUTO_INCREMENT PRIMARY KEY,
+    paket_id INT,
+    item_id INT,
+    jumlah_per_paket INT,
+    FOREIGN KEY (paket_id) REFERENCES PAKETBANTUAN(paket_id),
+    FOREIGN KEY (item_id) REFERENCES ITEM(item_id)
+);

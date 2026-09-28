@@ -1,18 +1,13 @@
 <?php
-include '../config/koneksi.php';
+include "../config/koneksi.php";
 
-if (isset($_GET['id'])) {
-    $id = $_GET['id'];
+if (!isset($_GET['id'])) { header("Location: index.php"); exit; }
+$id = $_GET['id'];
 
-    $delete = mysqli_query($conn, "DELETE FROM PAKETBANTUAN WHERE paket_id='$id'");
-
-    if ($delete) {
-        // kirim status sukses ke halaman index
-        header("Location: index.php?msg=deleted");
-        exit;
-    } else {
-        header("Location: index.php?msg=error");
-        exit;
-    }
+if (mysqli_query($conn, "DELETE FROM PAKETBANTUAN WHERE paket_id='$id'")) {
+    header("Location: index.php?msg=deleted");
+} else {
+    header("Location: index.php?msg=error");
 }
+exit;
 ?>
