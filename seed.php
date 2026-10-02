@@ -17,6 +17,7 @@
  * ============================================================================
  */
 include "config/koneksi.php";
+require_once "includes/auth.php";
 
 $koneksi_db = null;
 if (isset($conn)) $koneksi_db = $conn;
@@ -364,8 +365,13 @@ if ($db_ready) {
     }
 }
 
-$current_page = 'dashboard';
+$current_page = 'seed';
 $page_title   = 'Seed Data Dummy';
+
+// Seed hanya untuk admin. require_access() akan render halaman
+// Akses Ditolak kalau koordinator/petugas mencoba membuka.
+require_access('seed');
+
 include "includes/header.php";
 ?>
 <div class="flex min-h-screen w-full">

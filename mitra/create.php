@@ -1,5 +1,13 @@
 <?php
 include "../config/koneksi.php";
+require_once "../includes/auth.php";
+
+// Blokir akses langsung untuk role yang tidak boleh Create.
+if (!can_action('mitra', 'create')) {
+    http_response_code(403);
+    mbg_render_forbidden('mitra');
+    exit;
+}
 
 $koneksi_db = null;
 if (isset($conn)) $koneksi_db = $conn;

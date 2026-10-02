@@ -1,5 +1,6 @@
 <?php 
 include "../config/koneksi.php"; 
+require_once "../includes/auth.php";
 
 $koneksi_db = null;
 if (isset($conn)) $koneksi_db = $conn;
@@ -11,6 +12,11 @@ if (!$koneksi_db) {
 
 $current_page = 'user';
 $page_title   = 'Manajemen Pengguna';
+
+// Modul 'user' hanya untuk admin. require_access() akan render
+// halaman Akses Ditolak kalau koordinator/petugas mencoba masuk.
+require_access('user');
+
 include "../includes/header.php";
 ?>
 <div class="flex min-h-screen w-full">
@@ -89,11 +95,17 @@ include "../includes/header.php";
                             }
                             $role_lower = strtolower($row['role']);
                             if ($role_lower === 'admin') {
-                                $role_badge = 'bg-primary-50 text-primary-700';
-                            } elseif ($role_lower === 'staff') {
-                                $role_badge = 'bg-indigo-50 text-indigo-700';
+                                $role_badge = 'bg-primary-50 text-primary-700 ring-primary-500/20';
+                                $role_icon  = 'admin_panel_settings';
+                            } elseif ($role_lower === 'koordinator') {
+                                $role_badge = 'bg-indigo-50 text-indigo-700 ring-indigo-500/20';
+                                $role_icon  = 'supervisor_account';
+                            } elseif ($role_lower === 'petugas') {
+                                $role_badge = 'bg-emerald-50 text-emerald-700 ring-emerald-500/20';
+                                $role_icon  = 'engineering';
                             } else {
                                 $role_badge = 'bg-slate-100 text-slate-700';
+                                $role_icon  = 'person';
                             }
                     ?>
                         <tr class="hover:bg-slate-50/60 transition-colors group">
@@ -109,7 +121,8 @@ include "../includes/header.php";
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider <?= $role_badge ?>">
+                                <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ring-1 ring-inset <?= $role_badge ?>">
+                                    <span class="material-symbols-outlined text-[12px]"><?= $role_icon ?></span>
                                     <?= htmlspecialchars($row['role']) ?>
                                 </span>
                             </td>

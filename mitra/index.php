@@ -1,5 +1,6 @@
 <?php 
 include "../config/koneksi.php"; 
+require_once "../includes/auth.php";
 
 $koneksi_db = null;
 if (isset($conn)) $koneksi_db = $conn;
@@ -11,6 +12,12 @@ if (!$koneksi_db) {
 
 $current_page = 'mitra';
 $page_title   = 'Data Mitra';
+
+// Tentukan kemampuan CRUD user saat ini untuk modul mitra
+$mbg_can_create = can_action('mitra', 'create');
+$mbg_can_update = can_action('mitra', 'update');
+$mbg_can_delete = can_action('mitra', 'delete');
+
 include "../includes/header.php";
 ?>
 <div class="flex min-h-screen w-full">
@@ -32,9 +39,19 @@ include "../includes/header.php";
                 <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Data Mitra Kerjasama</h2>
                 <p class="text-slate-500 mt-1.5 text-sm">Kelola data partner, donatur, dan penyalur bantuan.</p>
             </div>
-            <a href="create.php" class="inline-flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-sm hover:shadow-glow">
-                <span class="material-symbols-outlined text-[20px]">add</span> Tambah Mitra
-            </a>
+            <div class="flex items-center gap-2">
+                <?php if (!$mbg_can_create): ?>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 ring-1 ring-amber-200">
+                    <span class="material-symbols-outlined text-[14px]">visibility</span>
+                    Mode Lihat Saja
+                </span>
+                <?php endif; ?>
+                <?php if ($mbg_can_create): ?>
+                <a href="create.php" class="inline-flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-sm hover:shadow-glow">
+                    <span class="material-symbols-outlined text-[20px]">add</span> Tambah Mitra
+                </a>
+                <?php endif; ?>
+            </div>
         </div>
 
         <!-- Alerts -->
@@ -132,15 +149,19 @@ include "../includes/header.php";
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                                    <?php if ($mbg_can_update): ?>
                                     <a href="update.php?id=<?= $row['mitra_id'] ?>" 
                                        class="flex items-center justify-center size-8 rounded-lg bg-white border border-slate-200 text-slate-500 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition-all shadow-sm" title="Edit">
                                         <span class="material-symbols-outlined text-[18px]">edit</span>
                                     </a>
+                                    <?php endif; ?>
+                                    <?php if ($mbg_can_delete): ?>
                                     <a href="delete.php?id=<?= $row['mitra_id'] ?>" 
                                        onclick="return confirm('Yakin hapus mitra ini?')"
                                        class="flex items-center justify-center size-8 rounded-lg bg-white border border-slate-200 text-slate-500 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all shadow-sm" title="Hapus">
                                         <span class="material-symbols-outlined text-[18px]">delete</span>
                                     </a>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>
@@ -155,10 +176,12 @@ include "../includes/header.php";
                                         <span class="material-symbols-outlined text-3xl">handshake</span>
                                     </div>
                                     <p class="text-slate-500 text-sm font-semibold">Belum ada mitra kerjasama</p>
+                                    <?php if ($mbg_can_create): ?>
                                     <a href="create.php" class="mt-4 inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 text-sm font-semibold">
                                         <span class="material-symbols-outlined text-[18px]">add</span>
                                         Tambah mitra pertama
                                     </a>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>

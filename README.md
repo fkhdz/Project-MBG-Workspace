@@ -90,12 +90,13 @@ Buka `http://localhost/Project-web-DB_MBG/seed.php` lalu klik **"Jalankan Seed D
 
 ## 🔐 Login & Autentikasi
 
-Sistem memiliki halaman login dengan **2 peran (role)**:
+Sistem memiliki halaman login dengan **3 peran (role)** yang terstandarisasi dengan tabel `USER`:
 
 | Role | Email | Password | Akses |
 |---|---|---|---|
-| **Admin** | `admin@gmail.com` | `1234` | Full akses ke seluruh modul |
-| **Karyawan** | `karyawan@gmail.com` | `1234` | Akses terbatas (modul-modul tertentu) |
+| **Admin** | `admin@gmail.com` | `1234` | Full akses ke seluruh modul + utility `seed.php` |
+| **Koordinator** | `koordinator@gmail.com` | `1234` | Review & validasi modul operasional (tidak bisa Kelola Pengguna / hapus master) |
+| **Petugas** | `petugas@gmail.com` | `1234` | Input lapangan: distribusi, laporan baru, update stok |
 
 ### Endpoint Autentikasi
 
@@ -128,8 +129,9 @@ Tambahkan 2 baris di paling atas setiap halaman yang ingin diproteksi:
 
 ```php
 require_once 'includes/auth.php';
-require_login();              // wajib login (admin / karyawan)
-// require_role('admin');     // uncomment jika hanya admin yang boleh akses
+require_login();                // wajib login (semua role)
+// require_access('user');       // hanya role yang boleh akses modul 'user'
+// require_role('admin');        // hanya role spesifik
 ```
 
 Fungsi helper yang tersedia di `includes/auth.php`:
@@ -139,7 +141,27 @@ Fungsi helper yang tersedia di `includes/auth.php`:
 | `is_logged_in()` | Cek apakah user sedang login |
 | `require_login()` | Redirect ke `login.php` kalau belum login |
 | `require_role('admin')` | Redirect kalau role tidak sesuai |
+| `can_access('mitra')` | Cek apakah role user boleh akses modul tertentu (return bool) |
+| `require_access('user')` | Tampilkan halaman "Akses Ditolak" kalau tidak boleh |
 | `mbg_authenticate($email, $pass)` | Validasi kredensial, return array data user / `null` |
+| `mbg_role_label($role)` | Label role dalam Bahasa Indonesia |
+| `mbg_role_badge_style($role)` | Style badge Tailwind per role |
+
+### Matriks Akses Modul per Role
+
+| Modul | Admin | Koordinator | Petugas |
+|---|:---:|:---:|:---:|
+| Dashboard | ✅ | ✅ | ✅ |
+| Mitra | CRUD penuh | Lihat+Validasi | Lihat saja |
+| **Pengguna** | CRUD penuh | ❌ | ❌ |
+| Penerima | CRUD penuh | Lihat+Validasi | Lihat saja |
+| Paket Bantuan | CRUD penuh | Lihat+Edit | Lihat saja |
+| Distribusi | CRUD penuh | Lihat+Edit+Status | Buat+Edit |
+| Laporan Data | CRUD penuh | **Review/Approve** ⭐ | **Buat baru** ⭐ |
+| Gudang Item | CRUD penuh | Lihat+Edit Stok | Lihat+Update Stok |
+| Seed Data | ✅ | ❌ | ❌ |
+
+> Sidebar secara otomatis **menyembunyikan menu** yang tidak boleh diakses sesuai role user yang sedang login. Jika user mencoba membuka URL langsung, akan tampil halaman **Akses Ditolak (403)**.
 
 ### Catatan Keamanan
 

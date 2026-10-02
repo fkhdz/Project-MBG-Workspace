@@ -86,9 +86,9 @@ include "../includes/header.php";
                         <label class="block text-sm font-semibold text-slate-700 mb-2">Role</label>
                         <div class="relative">
                             <select name="role" class="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all appearance-none cursor-pointer">
-                                <option value="admin" <?= ($data['role']=='admin')?'selected':'' ?>>Admin</option>
-                                <option value="staff" <?= ($data['role']=='staff')?'selected':'' ?>>Staff</option>
-                                <option value="user"  <?= ($data['role']=='user')?'selected':'' ?>>User</option>
+                                <option value="admin"       <?= ($data['role']=='admin')?'selected':'' ?>>Admin — Akses penuh semua modul</option>
+                                <option value="koordinator" <?= ($data['role']=='koordinator')?'selected':'' ?>>Koordinator — Validasi & review</option>
+                                <option value="petugas"     <?= ($data['role']=='petugas')?'selected':'' ?>>Petugas — Input lapangan</option>
                             </select>
                             <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
                         </div>

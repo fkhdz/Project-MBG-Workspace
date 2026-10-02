@@ -305,20 +305,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Info kredensial default -->
             <div class="mt-8 p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                <div class="flex items-center gap-2 mb-2">
+                <div class="flex items-center gap-2 mb-3">
                     <span class="material-symbols-outlined text-primary-600 text-[18px]">info</span>
-                    <h3 class="font-bold text-slate-900 text-sm">Akun Demo</h3>
+                    <h3 class="font-bold text-slate-900 text-sm">Akun Demo (3 Peran)</h3>
                 </div>
-                <div class="space-y-2 text-xs text-slate-600 font-mono">
+                <div class="space-y-2 text-xs">
                     <div class="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-lg border border-slate-200">
-                        <span class="font-bold text-slate-700">Admin</span>
-                        <span>admin@gmail.com / 1234</span>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary-600 text-[16px]">admin_panel_settings</span>
+                            <span class="font-bold text-slate-700">Admin</span>
+                        </div>
+                        <span class="font-mono text-slate-600">admin@gmail.com / 1234</span>
                     </div>
                     <div class="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-lg border border-slate-200">
-                        <span class="font-bold text-slate-700">Karyawan</span>
-                        <span>karyawan@gmail.com / 1234</span>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-indigo-600 text-[16px]">supervisor_account</span>
+                            <span class="font-bold text-slate-700">Koordinator</span>
+                        </div>
+                        <span class="font-mono text-slate-600">koordinator@gmail.com / 1234</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-lg border border-slate-200">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-emerald-600 text-[16px]">engineering</span>
+                            <span class="font-bold text-slate-700">Petugas</span>
+                        </div>
+                        <span class="font-mono text-slate-600">petugas@gmail.com / 1234</span>
                     </div>
                 </div>
+                <p class="text-[11px] text-slate-400 mt-3 italic">* Pembedaan fitur per role aktif di sidebar & modul Pengguna.</p>
             </div>
 
             <p class="text-center text-xs text-slate-400 mt-8">

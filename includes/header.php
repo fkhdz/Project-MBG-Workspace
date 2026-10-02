@@ -28,6 +28,9 @@ $mbg_current_user = [
     'role'  => $_SESSION['role']    ?? 'karyawan',
 ];
 
+// Inisialisasi variabel global view (untuk konsistensi akses di seluruh halaman).
+mbg_init_view();
+
 if (!isset($page_title))   $page_title = 'MBG Workspace';
 if (!isset($extra_head))   $extra_head = '';
 ?>
