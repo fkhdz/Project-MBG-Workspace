@@ -97,6 +97,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             user-select: none;
         }
         body { font-feature-settings: "cv11", "ss01"; }
+
+        /* Animasi float untuk ikon dekoratif */
+        @keyframes mbg-float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50%      { transform: translateY(-14px) rotate(2deg); }
+        }
+        @keyframes mbg-float-slow {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50%      { transform: translateY(-20px) rotate(-3deg); }
+        }
+        .mbg-float-1 { animation: mbg-float     9s ease-in-out infinite; }
+        .mbg-float-2 { animation: mbg-float-slow 11s ease-in-out infinite; }
+        .mbg-float-3 { animation: mbg-float     13s ease-in-out infinite; }
+        .mbg-float-4 { animation: mbg-float-slow 10s ease-in-out infinite; }
+
+        /* Slow drifting untuk orbs */
+        @keyframes mbg-drift {
+            0%, 100% { transform: translate(0, 0); }
+            50%      { transform: translate(20px, -20px); }
+        }
+        .mbg-drift { animation: mbg-drift 14s ease-in-out infinite; }
     </style>
 </head>
 <body class="font-sans bg-surface text-slate-800 antialiased min-h-screen">
@@ -104,51 +125,104 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="min-h-screen flex flex-col lg:flex-row">
 
     <!-- ============ PANEL KIRI: BRANDING ============ -->
-    <aside class="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-primary-700 via-primary-600 to-primary-500 text-white p-12 flex-col justify-between">
-        <!-- Decorative blobs -->
-        <div class="absolute -top-24 -left-24 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-0 right-0 w-[28rem] h-[28rem] bg-primary-300/30 rounded-full blur-3xl"></div>
+    <aside class="hidden lg:flex lg:w-1/2 relative overflow-hidden text-white p-12 flex-col justify-between"
+           style="background:
+                radial-gradient(circle at 20% 0%, rgba(56,189,248,0.45), transparent 55%),
+                radial-gradient(circle at 85% 100%, rgba(2,132,199,0.55), transparent 60%),
+                linear-gradient(135deg, #0c4a6e 0%, #0369a1 45%, #0284c7 100%);">
 
+        <!-- Pattern grid halus -->
+        <div class="absolute inset-0 opacity-[0.07]"
+             style="background-image:
+                linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px);
+                background-size: 32px 32px;"></div>
+
+        <!-- Glow orb atas-kiri -->
+        <div class="mbg-drift absolute -top-32 -left-32 w-[28rem] h-[28rem] bg-sky-300/30 rounded-full blur-3xl"></div>
+        <!-- Glow orb bawah-kanan -->
+        <div class="mbg-drift absolute -bottom-24 -right-24 w-[24rem] h-[24rem] bg-cyan-400/25 rounded-full blur-3xl" style="animation-delay: -4s;"></div>
+        <!-- Glow orb tengah (halus) -->
+        <div class="mbg-drift absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[32rem] h-[32rem] bg-white/5 rounded-full blur-3xl" style="animation-delay: -7s;"></div>
+
+        <!-- Pattern ikon MBG melayang samar -->
+        <div class="absolute inset-0 pointer-events-none select-none overflow-hidden" aria-hidden="true">
+            <span class="material-symbols-outlined mbg-float-1 absolute text-white/[0.06]" style="top: 8%; left: 6%; font-size: 80px;">restaurant</span>
+            <span class="material-symbols-outlined mbg-float-2 absolute text-white/[0.06]" style="top: 22%; right: 8%; font-size: 100px;">local_shipping</span>
+            <span class="material-symbols-outlined mbg-float-3 absolute text-white/[0.06]" style="bottom: 28%; left: 10%; font-size: 90px;">inventory_2</span>
+            <span class="material-symbols-outlined mbg-float-4 absolute text-white/[0.06]" style="bottom: 12%; right: 14%; font-size: 110px;">nutrition</span>
+            <span class="material-symbols-outlined mbg-float-2 absolute text-white/[0.05]" style="top: 48%; left: 38%; font-size: 60px;">rice_bowl</span>
+            <span class="material-symbols-outlined mbg-float-1 absolute text-white/[0.05]" style="top: 62%; right: 32%; font-size: 70px;">groups</span>
+            <span class="material-symbols-outlined mbg-float-3 absolute text-white/[0.05]" style="top: 5%; left: 48%; font-size: 50px;">handshake</span>
+            <span class="material-symbols-outlined mbg-float-4 absolute text-white/[0.05]" style="bottom: 45%; right: 5%; font-size: 55px;">analytics</span>
+        </div>
+
+        <!-- Garis dekoratif -->
+        <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+
+        <!-- Konten (z-10 supaya di atas semua dekorasi) -->
         <div class="relative z-10">
             <div class="flex items-center gap-3 mb-12">
-                <div class="size-12 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center ring-1 ring-white/20">
+                <div class="relative size-14 rounded-2xl bg-white/15 backdrop-blur-xl flex items-center justify-center ring-1 ring-white/25 shadow-lg shadow-black/10">
                     <span class="material-symbols-outlined text-3xl">lunch_dining</span>
+                    <span class="absolute -top-1 -right-1 size-3 rounded-full bg-emerald-400 ring-2 ring-primary-700 animate-pulse"></span>
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-tight">MBG Workspace</h1>
-                    <p class="text-primary-100 text-sm">Logistics & Distribution System</p>
+                    <p class="text-sky-100 text-sm font-medium">Logistics & Distribution System</p>
                 </div>
             </div>
 
             <h2 class="text-4xl xl:text-5xl font-extrabold leading-tight tracking-tight">
                 Kelola distribusi<br>
-                <span class="text-primary-100">Makan Bergizi Gratis</span><br>
+                <span class="bg-gradient-to-r from-sky-200 via-white to-sky-100 bg-clip-text text-transparent">Makan Bergizi Gratis</span><br>
                 jadi lebih mudah.
             </h2>
-            <p class="mt-6 text-primary-50 text-base max-w-md leading-relaxed">
+            <p class="mt-6 text-sky-50/90 text-base max-w-md leading-relaxed">
                 Sistem informasi terpadu untuk manajemen mitra, penerima bantuan,
                 inventaris gudang, hingga pelacakan distribusi dan laporan analitik
                 Program MBG Nasional.
             </p>
 
+            <!-- Stats cards dengan ikon -->
             <div class="mt-10 grid grid-cols-3 gap-4 max-w-md">
-                <div class="bg-white/10 backdrop-blur rounded-xl p-4 ring-1 ring-white/15">
-                    <p class="text-2xl font-bold">7+</p>
-                    <p class="text-[11px] uppercase tracking-wider text-primary-100 mt-1">Modul CRUD</p>
+                <div class="group bg-white/10 hover:bg-white/15 backdrop-blur-xl rounded-xl p-4 ring-1 ring-white/20 transition-all hover:-translate-y-0.5">
+                    <div class="size-8 rounded-lg bg-sky-400/20 flex items-center justify-center mb-2 ring-1 ring-sky-300/30">
+                        <span class="material-symbols-outlined text-sky-100 text-[18px]">dashboard_customize</span>
+                    </div>
+                    <p class="text-2xl font-extrabold">7+</p>
+                    <p class="text-[10px] uppercase tracking-wider text-sky-100/80 mt-0.5 font-semibold">Modul CRUD</p>
                 </div>
-                <div class="bg-white/10 backdrop-blur rounded-xl p-4 ring-1 ring-white/15">
-                    <p class="text-2xl font-bold">3NF</p>
-                    <p class="text-[11px] uppercase tracking-wider text-primary-100 mt-1">Schema</p>
+                <div class="group bg-white/10 hover:bg-white/15 backdrop-blur-xl rounded-xl p-4 ring-1 ring-white/20 transition-all hover:-translate-y-0.5">
+                    <div class="size-8 rounded-lg bg-sky-400/20 flex items-center justify-center mb-2 ring-1 ring-sky-300/30">
+                        <span class="material-symbols-outlined text-sky-100 text-[18px]">database</span>
+                    </div>
+                    <p class="text-2xl font-extrabold">3NF</p>
+                    <p class="text-[10px] uppercase tracking-wider text-sky-100/80 mt-0.5 font-semibold">Schema</p>
                 </div>
-                <div class="bg-white/10 backdrop-blur rounded-xl p-4 ring-1 ring-white/15">
-                    <p class="text-2xl font-bold">2</p>
-                    <p class="text-[11px] uppercase tracking-wider text-primary-100 mt-1">Role Akses</p>
+                <div class="group bg-white/10 hover:bg-white/15 backdrop-blur-xl rounded-xl p-4 ring-1 ring-white/20 transition-all hover:-translate-y-0.5">
+                    <div class="size-8 rounded-lg bg-sky-400/20 flex items-center justify-center mb-2 ring-1 ring-sky-300/30">
+                        <span class="material-symbols-outlined text-sky-100 text-[18px]">verified_user</span>
+                    </div>
+                    <p class="text-2xl font-extrabold">2</p>
+                    <p class="text-[10px] uppercase tracking-wider text-sky-100/80 mt-0.5 font-semibold">Role Akses</p>
                 </div>
+            </div>
+
+            <!-- Quote / tagline kecil -->
+            <div class="mt-8 flex items-center gap-2 text-sky-100/70 text-xs">
+                <span class="size-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Sistem online &mdash; siap melayani</span>
             </div>
         </div>
 
-        <div class="relative z-10 text-xs text-primary-100/80">
-            &copy; <?= date('Y') ?> MBG Workspace. All rights reserved.
+        <div class="relative z-10 flex items-center justify-between text-xs text-sky-100/70">
+            <span>&copy; <?= date('Y') ?> MBG Workspace. All rights reserved.</span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur ring-1 ring-white/15">
+                <span class="material-symbols-outlined text-[14px]">bolt</span>
+                v1.0
+            </span>
         </div>
     </aside>
 
