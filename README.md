@@ -12,6 +12,7 @@
 
 - [Tech Stack](#-tech-stack)
 - [Quick Start](#-quick-start)
+- [Login & Autentikasi](#-login--autentikasi)
 - [Struktur Proyek](#-struktur-proyek)
 - [Database Schema](#-database-schema)
 - [Design System](#-design-system)
@@ -84,6 +85,55 @@ Buka `http://localhost/Project-web-DB_MBG/seed.php` lalu klik **"Jalankan Seed D
 - Menampilkan ringkasan jumlah baris per tabel
 
 > ⚠️ **PERINGATAN:** Seed akan **menghapus semua data**. Hanya untuk development/demo.
+
+---
+
+## 🔐 Login & Autentikasi
+
+Sistem memiliki halaman login dengan **2 peran (role)**:
+
+| Role | Email | Password | Akses |
+|---|---|---|---|
+| **Admin** | `admin@gmail.com` | `1234` | Full akses ke seluruh modul |
+| **Karyawan** | `karyawan@gmail.com` | `1234` | Akses terbatas (modul-modul tertentu) |
+
+### Endpoint Autentikasi
+
+| Method | URL | Keterangan |
+|---|---|---|
+| GET | `/login.php` | Halaman form login |
+| POST | `/login.php` | Submit kredensial (field: `email`, `password`) |
+| GET | `/logout.php` | Hancurkan sesi & kembali ke halaman login |
+
+### Cara Kerja
+
+1. Akses `http://localhost/Project-web-DB_MBG/login.php`
+2. Masukkan email & password (lihat tabel di atas)
+3. Setelah berhasil, user diarahkan ke **dashboard** (`index.php`)
+4. Session disimpan di `$_SESSION` dengan key: `user_id`, `nama`, `email`, `role`, `login_at`
+
+### Melindungi Halaman dengan Auth
+
+Tambahkan 2 baris di paling atas setiap halaman yang ingin diproteksi:
+
+```php
+require_once 'includes/auth.php';
+require_login();              // wajib login (admin / karyawan)
+// require_role('admin');     // uncomment jika hanya admin yang boleh akses
+```
+
+Fungsi helper yang tersedia di `includes/auth.php`:
+
+| Fungsi | Keterangan |
+|---|---|
+| `is_logged_in()` | Cek apakah user sedang login |
+| `require_login()` | Redirect ke `login.php` kalau belum login |
+| `require_role('admin')` | Redirect kalau role tidak sesuai |
+| `mbg_authenticate($email, $pass)` | Validasi kredensial, return array data user / `null` |
+
+### Catatan Keamanan
+
+> ⚠️ Kredensial di atas saat ini masih **hardcode statis** di `includes/auth.php` (fungsi `mbg_get_static_credentials()`). Untuk produksi, ganti blok tersebut dengan **query ke tabel `USER`** dan gunakan hashing `password_hash()` / `password_verify()` (saat ini seed masih memakai `MD5`).
 
 ---
 
