@@ -13,7 +13,44 @@
  *   echo '</main></div></body></html>';
  */
 
+// $mbg_current_user sudah di-set oleh includes/header.php sebelum file ini di-include.
+// Fallback kalau sidebar di-include tanpa header (mis. halaman publik tertentu).
+if (!isset($mbg_current_user)) {
+    $mbg_current_user = [
+        'id'    => $_SESSION['user_id'] ?? null,
+        'nama'  => $_SESSION['nama']    ?? 'Pengguna',
+        'email' => $_SESSION['email']   ?? '',
+        'role'  => $_SESSION['role']    ?? 'karyawan',
+    ];
+}
+
+$mbg_user_nama  = $mbg_current_user['nama']  ?: 'Pengguna';
+$mbg_user_email = $mbg_current_user['email'] ?: '';
+$mbg_user_role  = $mbg_current_user['role']  ?: 'karyawan';
+
+// Inisial avatar dari nama user (untuk avatar di sidebar)
+$mbg_avatar_initials = strtoupper(substr(preg_replace('/\s+/', ' ', trim($mbg_user_nama)), 0, 1));
+$mbg_avatar_url = 'https://ui-avatars.com/api/?name=' . urlencode($mbg_user_nama)
+                . '&background=0ea5e9&color=fff&bold=true';
+
 if (!isset($current_page)) $current_page = '';
+
+/**
+ * Deteksi level direktori otomatis:
+ * - Disertakan dari root    (mis. /index.php)        → $base = ''
+ * - Disertakan dari modul   (mis. /mitra/index.php)   → $base = '../'
+ * - Bisa di-override manual dengan set $sidebar_base sebelum include
+ */
+if (!isset($sidebar_base)) {
+    // __FILE__ dari sidebar.php; bandingkan dengan path skrip yang memanggilnya
+    $caller = isset($_SERVER['SCRIPT_FILENAME']) ? $_SERVER['SCRIPT_FILENAME'] : __FILE__;
+    $sidebar_dir = str_replace('\\', '/', dirname(__FILE__));
+    $caller_dir  = str_replace('\\', '/', dirname($caller));
+    $sidebar_base = ($sidebar_dir === $caller_dir) ? '' : '../';
+}
+
+// URL logout adaptif terhadap base direktori
+$mbg_logout_url = $sidebar_base . 'logout.php';
 
 /**
  * Deteksi level direktori otomatis:
@@ -52,14 +89,14 @@ $nav_items = [
         </div>
     </div>
 
-    <!-- Profil Admin -->
+    <!-- Profil User (dari session login) -->
     <div class="flex items-center gap-3 px-5 py-4 border-b border-slate-100">
         <div class="size-10 rounded-full ring-2 ring-primary-100 bg-cover bg-center shadow-sm"
-             style="background-image: url('https://ui-avatars.com/api/?name=Admin+MBG&background=0ea5e9&color=fff&bold=true');">
+             style="background-image: url('<?= htmlspecialchars($mbg_avatar_url) ?>');">
         </div>
         <div class="flex flex-col leading-tight min-w-0">
-            <h2 class="text-slate-900 text-sm font-bold truncate">Administrator</h2>
-            <p class="text-slate-500 text-xs mt-0.5 truncate">admin@portal.com</p>
+            <h2 class="text-slate-900 text-sm font-bold truncate"><?= htmlspecialchars($mbg_user_nama) ?></h2>
+            <p class="text-slate-500 text-xs mt-0.5 truncate"><?= htmlspecialchars($mbg_user_email) ?></p>
         </div>
     </div>
 
@@ -87,10 +124,12 @@ $nav_items = [
 
     <!-- Logout -->
     <div class="p-3 border-t border-slate-100">
-        <button class="w-full flex items-center justify-center gap-2 rounded-xl h-11 px-4 bg-slate-50 text-slate-600 hover:bg-red-50 hover:text-red-600 text-sm font-semibold transition-colors border border-slate-100 hover:border-red-100">
+        <a href="<?= htmlspecialchars($mbg_logout_url) ?>"
+           onclick="return confirm('Yakin ingin keluar dari sesi ini?');"
+           class="w-full flex items-center justify-center gap-2 rounded-xl h-11 px-4 bg-slate-50 text-slate-600 hover:bg-red-50 hover:text-red-600 text-sm font-semibold transition-colors border border-slate-100 hover:border-red-100">
             <span class="material-symbols-outlined text-[20px]">logout</span>
             Keluar
-        </button>
+        </a>
     </div>
 </aside>
 
@@ -137,5 +176,15 @@ $nav_items = [
                 </a>
             <?php endforeach; ?>
         </nav>
+
+        <!-- Logout (mobile) -->
+        <div class="mt-4 pt-4 border-t border-slate-100">
+            <a href="<?= htmlspecialchars($mbg_logout_url) ?>"
+               onclick="return confirm('Yakin ingin keluar dari sesi ini?');"
+               class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors">
+                <span class="material-symbols-outlined text-[22px]">logout</span>
+                <span>Keluar</span>
+            </a>
+        </div>
     </div>
 </div>

@@ -16,6 +16,10 @@
  */
 require_once 'includes/auth.php';
 
+// Tandai halaman ini sebagai publik agar includes/header.php
+// tidak melakukan redirect ke login.php (loop).
+$public_page = true;
+
 // Kalau sudah login, langsung lempar ke dashboard.
 if (is_logged_in()) {
     header('Location: index.php');

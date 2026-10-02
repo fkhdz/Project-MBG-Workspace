@@ -7,7 +7,27 @@
  * Variabel opsional:
  *   $page_title    : judul halaman (default: 'MBG Workspace')
  *   $extra_head    : string tambahan di <head> (mis. CSS/JS tambahan)
+ *
+ * Otomatis memproteksi halaman agar wajib login, kecuali untuk
+ * halaman yang men-set $public_page = true SEBELUM include.
  */
+require_once __DIR__ . '/auth.php';
+
+// Halaman yang dikecualikan dari proteksi login (mis. login.php, logout.php)
+if (!isset($public_page)) $public_page = false;
+
+if (!$public_page) {
+    require_login();
+}
+
+// Data user yang sedang login (untuk ditampilkan di sidebar/header)
+$mbg_current_user = [
+    'id'    => $_SESSION['user_id'] ?? null,
+    'nama'  => $_SESSION['nama']    ?? 'Pengguna',
+    'email' => $_SESSION['email']   ?? '',
+    'role'  => $_SESSION['role']    ?? 'karyawan',
+];
+
 if (!isset($page_title))   $page_title = 'MBG Workspace';
 if (!isset($extra_head))   $extra_head = '';
 ?>

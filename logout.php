@@ -8,6 +8,11 @@
  */
 require_once 'includes/auth.php';
 
+// Tandai halaman ini publik — session_destroy() di bawah akan
+// menghapus data login sehingga halaman logout sendiri tidak
+// boleh memanggil require_login() (akan terjadi loop).
+$public_page = true;
+
 // Bersihkan semua variabel session
 $_SESSION = [];
 

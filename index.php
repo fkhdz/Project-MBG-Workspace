@@ -22,6 +22,11 @@ elseif  ($hour < 15) $greeting = "Selamat Siang";
 elseif  ($hour < 18) $greeting = "Selamat Sore";
 else                 $greeting = "Selamat Malam";
 
+// Sapaan personal sesuai user yang sedang login.
+$mbg_dashboard_nama = $mbg_current_user['nama'] ?: 'Admin';
+$mbg_dashboard_role = $mbg_current_user['role'] ?: 'admin';
+$mbg_dashboard_sapa = $mbg_dashboard_role === 'admin' ? 'Admin' : 'Staf';
+
 $current_page = 'dashboard';
 $page_title   = 'Dashboard';
 include "includes/header.php";
@@ -35,7 +40,7 @@ include "includes/header.php";
         <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
                 <p class="text-xs font-bold text-primary-600 uppercase tracking-widest mb-2">Dashboard Utama</p>
-                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight"><?= $greeting ?>, Admin! 👋</h2>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight"><?= $greeting ?>, <?= htmlspecialchars($mbg_dashboard_sapa) ?>! 👋</h2>
                 <p class="text-slate-500 mt-1.5 text-sm sm:text-base">Berikut adalah ringkasan operasional distribusi bantuan hari ini.</p>
             </div>
             <div class="flex flex-wrap gap-2">

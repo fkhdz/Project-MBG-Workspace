@@ -107,10 +107,20 @@ Sistem memiliki halaman login dengan **2 peran (role)**:
 
 ### Cara Kerja
 
-1. Akses `http://localhost/Project-web-DB_MBG/login.php`
+1. Akses `http://localhost/Project-web-DB_MBG/login.php` — semua halaman lain akan otomatis redirect ke sini kalau belum login
 2. Masukkan email & password (lihat tabel di atas)
 3. Setelah berhasil, user diarahkan ke **dashboard** (`index.php`)
 4. Session disimpan di `$_SESSION` dengan key: `user_id`, `nama`, `email`, `role`, `login_at`
+5. Klik tombol **Keluar** di sidebar → kembali ke halaman login
+
+> ✅ **Proteksi otomatis:** `includes/header.php` sudah memanggil `require_login()` secara global, jadi **semua halaman CRUD (mitra, penerima, paket, distribusi, laporan, item, user) otomatis aman** tanpa harus mengubah file modul-nya satu per satu.
+> 
+> Untuk menjadikan sebuah halaman **publik** (tidak wajib login), set variabel ini sebelum include header:
+> ```php
+> $public_page = true;
+> include 'includes/header.php';
+> ```
+> Contoh penggunaan: `login.php`, `logout.php`.
 
 ### Melindungi Halaman dengan Auth
 
