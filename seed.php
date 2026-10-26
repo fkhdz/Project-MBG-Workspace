@@ -1,21 +1,5 @@
 <?php
-/**
- * ============================================================================
- *  SEED DATA DUMMY - MBG Workspace
- * ============================================================================
- *  Skrip untuk mengisi data dummy ke seluruh tabel database agar
- *  modul Laporan Data, Gudang Item, dan modul lainnya memiliki data.
- *
- *  Cara pakai:
- *    1. Buka halaman ini di browser:  http://localhost/.../seed.php
- *    2. Klik tombol "Jalankan Seed Data"
- *    3. Data dummy akan di-generate (idempotent — TRUNCATE dulu).
- *
- *  CATATAN:
- *    - Skrip ini akan MENGHAPUS semua data lama di tabel terkait.
- *    - Hanya untuk development / demo, JANGAN jalankan di production.
- * ============================================================================
- */
+
 include "config/koneksi.php";
 require_once "includes/auth.php";
 
@@ -25,10 +9,8 @@ elseif (isset($koneksi)) $koneksi_db = $koneksi;
 
 $db_ready = ($koneksi_db !== null);
 
-// ----- Eksekusi seed bila diminta -----
 $run_seed = isset($_POST['run_seed']) && $_POST['run_seed'] === 'yes' && $db_ready;
 
-// ----- Auto-create tabel yang hilang (ITEM & DETAIL_PAKET) -----
 $table_create_results = [];
 if ($db_ready) {
     $create_sql = [
@@ -51,17 +33,13 @@ if ($db_ready) {
     foreach ($create_sql as $name => $sql) {
         $table_create_results[$name] = @mysqli_query($koneksi_db, $sql);
     }
-    // re-detect tabel
     $existing_tables = [];
     $tr = @mysqli_query($koneksi_db, "SHOW TABLES");
     if ($tr) while ($r = mysqli_fetch_row($tr)) $existing_tables[] = strtolower($r[0]);
 }
 
 if ($run_seed) {
-    // Matikan cek foreign key sementara agar TRUNCATE berurutan bisa jalan
     mysqli_query($koneksi_db, "SET FOREIGN_KEY_CHECKS = 0");
-
-    // Bersihkan semua tabel (hanya yang ada, urutan tidak penting karena FK di-off)
     $tables = ['LAPORANDATA', 'DISTRIBUSI', 'DETAIL_PAKET', 'PAKETBANTUAN', 'PENERIMA', 'MITRA', 'USER', 'ITEM'];
     foreach ($tables as $t) {
         if (in_array(strtolower($t), $existing_tables)) {
@@ -72,9 +50,6 @@ if ($run_seed) {
 
     $ok = [];
 
-    // ============================================================
-    // 1) USER (15 user)
-    // ============================================================
     $user_names = [
         ['Administrator',     'admin@mbg.id',        'admin'],
         ['Budi Santoso',      'budi.santoso@mbg.id', 'petugas'],
@@ -108,9 +83,6 @@ if ($run_seed) {
     }
     $ok['USER'] = count($user_ids);
 
-    // ============================================================
-    // 2) MITRA (8 mitra, masing-masing terkait 1 user)
-    // ============================================================
     $mitra_data = [
         ['Yayasan Peduli Anak',      'Lembaga Sosial',    'Hj. Maryati',     'Jl. Merdeka No.12, Jakarta Pusat',  'DKI Jakarta'],
         ['CV Nutrisi Bangsa',         'Supplier Bahan',    'Irwan Setiawan',  'Jl. Industri Raya No.45, Bekasi',   'Jawa Barat'],
@@ -133,9 +105,6 @@ if ($run_seed) {
     }
     $ok['MITRA'] = count($mitra_ids);
 
-    // ============================================================
-    // 3) PENERIMA (30 penerima terkait user)
-    // ============================================================
     $nama_depan = ['Ahmad','Bintang','Citra','Dian','Eka','Fikri','Galih','Hani','Irfan','Jaka','Kartika','Lutfi','Maulana','Nanda','Oki','Putra','Qori','Rangga','Salsa','Tegar','Umi','Vina','Wahyu','Yanto','Zara','Aisyah','Bayu','Dewi','Erlang','Fani'];
     $nama_belakang = ['Pratama','Wijaya','Lestari','Saputra','Putri','Nugroho','Anggraini','Maulana','Permata','Hidayat','Ramadhan','Sari','Maharani','Setiawan','Fadilah','Kusuma'];
     $kecamatan = ['Cempaka Putih','Kemayoran','Senen','Gambir','Tanah Abang','Menteng','Setiabudi','Tebet','Pasar Minggu','Jagakarsa','Kebayoran','Cilandak','Mampang Prapatan','Pancoran'];
@@ -166,9 +135,6 @@ if ($run_seed) {
     }
     $ok['PENERIMA'] = count($penerima_ids);
 
-    // ============================================================
-    // 4) ITEM (20 item bahan pangan)
-    // ============================================================
     $items = [
         ['Beras Premium 5kg',         'kg',    1500],
         ['Telur Ayam Negeri 1kg',     'butir', 18000],
@@ -201,9 +167,6 @@ if ($run_seed) {
     }
     $ok['ITEM'] = count($item_ids);
 
-    // ============================================================
-    // 5) PAKETBANTUAN (10 paket)
-    // ============================================================
     $paket_data = [
         ['Paket Balita Sehat',           'Paket gizi untuk balita usia 1-5 tahun',     'Paket Balita',     650,   3, 200],
         ['Paket Ibu Hamil',              'Paket nutrisi untuk ibu hamil & menyusui',     'Paket Ibu Hamil',  800,   4, 150],
@@ -227,9 +190,6 @@ if ($run_seed) {
     }
     $ok['PAKETBANTUAN'] = count($paket_ids);
 
-    // ============================================================
-    // 6) DETAIL_PAKET (komposisi paket, 3-5 item per paket)
-    // ============================================================
     $detail_count = 0;
     foreach ($paket_ids as $pi => $paket_id) {
         // pilih 3-5 item acak
@@ -248,9 +208,7 @@ if ($run_seed) {
     }
     $ok['DETAIL_PAKET'] = $detail_count;
 
-    // ============================================================
-    // 7) DISTRIBUSI (40 distribusi dalam 6 bulan terakhir)
-    // ============================================================
+
     $lokasi = [
         'Posyandu Anggrek, Cempaka Putih',
         'Panti Asuhan Kasih Bunda, Yogyakarta',
@@ -300,9 +258,6 @@ if ($run_seed) {
     }
     $ok['DISTRIBUSI'] = count($distribusi_ids);
 
-    // ============================================================
-    // 8) LAPORANDATA (1 laporan per distribusi yang selesai)
-    // ============================================================
     $status_laporan = ['Disetujui', 'Disetujui', 'Disetujui', 'Menunggu Review', 'Ditolak'];
     $laporan_count = 0;
     foreach ($distribusi_ids as $did) {
@@ -330,12 +285,10 @@ if ($run_seed) {
     $ok['LAPORANDATA'] = $laporan_count;
 }
 
-// ----- Hitung statistik saat ini untuk ditampilkan (defensif) -----
 $stats = [];
 $existing_tables = [];
 $missing_tables  = [];
 if ($db_ready) {
-    // deteksi tabel yang ada di database
     $tr = @mysqli_query($koneksi_db, "SHOW TABLES");
     if ($tr) {
         while ($r = mysqli_fetch_row($tr)) $existing_tables[] = strtolower($r[0]);
@@ -360,7 +313,7 @@ if ($db_ready) {
             $r = @mysqli_query($koneksi_db, $q);
             $stats[$label] = $r ? (int)mysqli_fetch_assoc($r)['c'] : 0;
         } else {
-            $stats[$label] = '—';  // tabel belum ada
+            $stats[$label] = '—';  
         }
     }
 }
@@ -368,8 +321,6 @@ if ($db_ready) {
 $current_page = 'seed';
 $page_title   = 'Seed Data Dummy';
 
-// Seed hanya untuk admin. require_access() akan render halaman
-// Akses Ditolak kalau koordinator/petugas mencoba membuka.
 require_access('seed');
 
 include "includes/header.php";
@@ -379,15 +330,11 @@ include "includes/header.php";
 
 <main class="flex-1 min-w-0">
     <div class="px-5 sm:px-8 lg:px-10 py-6 lg:py-8 max-w-[1100px] mx-auto">
-
-        <!-- Breadcrumb -->
         <nav class="flex items-center gap-2 text-sm mb-2">
             <a href="index.php" class="text-slate-500 hover:text-primary-600 font-medium transition-colors">Dashboard</a>
             <span class="text-slate-300">/</span>
             <span class="text-slate-700 font-semibold">Seed Data Dummy</span>
         </nav>
-
-        <!-- Header -->
         <div class="mb-8">
             <p class="text-xs font-bold text-primary-600 uppercase tracking-widest mb-2">Alat Pengembangan</p>
             <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Seed Data Dummy</h2>
@@ -396,7 +343,6 @@ include "includes/header.php";
             </p>
         </div>
 
-        <!-- Banner jika koneksi DB gagal -->
         <?php if (!$db_ready): ?>
             <div class="bg-red-50 border border-red-200 rounded-2xl p-6 mb-6">
                 <div class="flex items-start gap-3">
@@ -422,7 +368,6 @@ include "includes/header.php";
             </div>
         <?php endif; ?>
 
-        <!-- Hasil eksekusi -->
         <?php if (isset($ok) && $run_seed): ?>
             <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 mb-6">
                 <div class="flex items-start gap-3 mb-4">
@@ -443,7 +388,6 @@ include "includes/header.php";
             </div>
         <?php endif; ?>
 
-        <!-- Statistik saat ini -->
         <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-6 mb-6">
             <div class="flex items-center justify-between mb-5">
                 <div>
@@ -473,8 +417,6 @@ include "includes/header.php";
                 <?php endforeach; ?>
             </div>
         </div>
-
-        <!-- Form seed -->
         <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-6 mb-6">
             <div class="flex items-start gap-3 mb-4">
                 <div class="size-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
@@ -519,8 +461,6 @@ include "includes/header.php";
                 </a>
             </form>
         </div>
-
-        <!-- Tabel referensi login -->
         <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-6">
             <div class="flex items-center gap-2 mb-3">
                 <span class="material-symbols-outlined text-primary-600">info</span>

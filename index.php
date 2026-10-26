@@ -26,8 +26,6 @@ $current_page = 'dashboard';
 $page_title   = 'Dashboard';
 include "includes/header.php";
 
-// Sapaan personal sesuai user yang sedang login.
-// ($mbg_current_user sudah di-set oleh includes/header.php via auth.php.)
 $mbg_dashboard_nama = $mbg_current_user['nama'] ?? 'Admin';
 $mbg_dashboard_role = $mbg_current_user['role'] ?? 'admin';
 $mbg_dashboard_sapa = $mbg_dashboard_role === 'admin' ? 'Admin' : 'Staf';

@@ -1,26 +1,8 @@
 <?php
-/**
- * ============================================================================
- *  HALAMAN LOGIN - MBG Workspace
- * ============================================================================
- *  Halaman login dengan 2 peran:
- *    - admin     -> email: admin@gmail.com    password: 1234
- *    - karyawan  -> email: karyawan@gmail.com password: 1234
- *
- *  Catatan:
- *    - Kredensial saat ini di-handle oleh helper statis di includes/auth.php.
- *    - Pada halaman sukses, user akan diarahkan ke index.php (dashboard).
- *    - Setiap halaman lain yang ingin diproteksi cukup memanggil
- *      require_login() dari includes/auth.php.
- * ============================================================================
- */
 require_once 'includes/auth.php';
 
-// Tandai halaman ini sebagai publik agar includes/header.php
-// tidak melakukan redirect ke login.php (loop).
 $public_page = true;
 
-// Kalau sudah login, langsung lempar ke dashboard.
 if (is_logged_in()) {
     header('Location: index.php');
     exit;
@@ -39,9 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $user = mbg_authenticate($email_val, $password);
         if ($user) {
-            // Regenerasi session ID untuk mencegah session fixation.
             session_regenerate_id(true);
-            $_SESSION['user_id']  = $user['email']; // sementara pakai email sbg id statis
+            $_SESSION['user_id']  = $user['email']; 
             $_SESSION['nama']     = $user['nama'];
             $_SESSION['email']    = $user['email'];
             $_SESSION['role']     = $user['role'];
@@ -62,10 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title><?= htmlspecialchars($page_title) ?> - MBG Workspace</title>
 
-    <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -98,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         body { font-feature-settings: "cv11", "ss01"; }
 
-        /* Animasi float untuk ikon dekoratif */
         @keyframes mbg-float {
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50%      { transform: translateY(-14px) rotate(2deg); }
@@ -112,7 +89,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .mbg-float-3 { animation: mbg-float     13s ease-in-out infinite; }
         .mbg-float-4 { animation: mbg-float-slow 10s ease-in-out infinite; }
 
-        /* Slow drifting untuk orbs */
         @keyframes mbg-drift {
             0%, 100% { transform: translate(0, 0); }
             50%      { transform: translate(20px, -20px); }
@@ -131,21 +107,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 radial-gradient(circle at 85% 100%, rgba(2,132,199,0.55), transparent 60%),
                 linear-gradient(135deg, #0c4a6e 0%, #0369a1 45%, #0284c7 100%);">
 
-        <!-- Pattern grid halus -->
         <div class="absolute inset-0 opacity-[0.07]"
              style="background-image:
                 linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px);
                 background-size: 32px 32px;"></div>
-
-        <!-- Glow orb atas-kiri -->
         <div class="mbg-drift absolute -top-32 -left-32 w-[28rem] h-[28rem] bg-sky-300/30 rounded-full blur-3xl"></div>
-        <!-- Glow orb bawah-kanan -->
         <div class="mbg-drift absolute -bottom-24 -right-24 w-[24rem] h-[24rem] bg-cyan-400/25 rounded-full blur-3xl" style="animation-delay: -4s;"></div>
-        <!-- Glow orb tengah (halus) -->
         <div class="mbg-drift absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[32rem] h-[32rem] bg-white/5 rounded-full blur-3xl" style="animation-delay: -7s;"></div>
-
-        <!-- Pattern ikon MBG melayang samar -->
         <div class="absolute inset-0 pointer-events-none select-none overflow-hidden" aria-hidden="true">
             <span class="material-symbols-outlined mbg-float-1 absolute text-white/[0.06]" style="top: 8%; left: 6%; font-size: 80px;">restaurant</span>
             <span class="material-symbols-outlined mbg-float-2 absolute text-white/[0.06]" style="top: 22%; right: 8%; font-size: 100px;">local_shipping</span>
@@ -156,12 +125,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <span class="material-symbols-outlined mbg-float-3 absolute text-white/[0.05]" style="top: 5%; left: 48%; font-size: 50px;">handshake</span>
             <span class="material-symbols-outlined mbg-float-4 absolute text-white/[0.05]" style="bottom: 45%; right: 5%; font-size: 55px;">analytics</span>
         </div>
-
-        <!-- Garis dekoratif -->
         <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
         <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-
-        <!-- Konten (z-10 supaya di atas semua dekorasi) -->
         <div class="relative z-10">
             <div class="flex items-center gap-3 mb-12">
                 <div class="relative size-14 rounded-2xl bg-white/15 backdrop-blur-xl flex items-center justify-center ring-1 ring-white/25 shadow-lg shadow-black/10">
@@ -184,8 +149,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 inventaris gudang, hingga pelacakan distribusi dan laporan analitik
                 Program MBG Nasional.
             </p>
-
-            <!-- Stats cards dengan ikon -->
             <div class="mt-10 grid grid-cols-3 gap-4 max-w-md">
                 <div class="group bg-white/10 hover:bg-white/15 backdrop-blur-xl rounded-xl p-4 ring-1 ring-white/20 transition-all hover:-translate-y-0.5">
                     <div class="size-8 rounded-lg bg-sky-400/20 flex items-center justify-center mb-2 ring-1 ring-sky-300/30">
@@ -209,8 +172,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <p class="text-[10px] uppercase tracking-wider text-sky-100/80 mt-0.5 font-semibold">Role Akses</p>
                 </div>
             </div>
-
-            <!-- Quote / tagline kecil -->
             <div class="mt-8 flex items-center gap-2 text-sky-100/70 text-xs">
                 <span class="size-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span>Sistem online &mdash; siap melayani</span>
@@ -229,8 +190,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- ============ PANEL KANAN: FORM LOGIN ============ -->
     <main class="flex-1 flex items-center justify-center p-6 sm:p-10">
         <div class="w-full max-w-md">
-
-            <!-- Brand mobile -->
             <div class="lg:hidden flex items-center gap-3 mb-8 justify-center">
                 <div class="size-11 rounded-xl bg-primary-600 text-white flex items-center justify-center shadow-glow">
                     <span class="material-symbols-outlined text-2xl">lunch_dining</span>
@@ -244,7 +203,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p class="text-slate-500 mt-2 text-sm">Gunakan kredensial yang telah diberikan untuk melanjutkan ke dashboard.</p>
             </div>
 
-            <!-- Alert Error -->
             <?php if ($error !== ''): ?>
                 <div class="mb-5 flex items-start gap-3 p-4 bg-red-50 text-red-700 rounded-xl border border-red-100 shadow-sm" role="alert">
                     <span class="material-symbols-outlined text-red-500 mt-0.5">error</span>
@@ -255,9 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php endif; ?>
 
-            <!-- Form -->
             <form method="POST" class="space-y-5" novalidate>
-                <!-- Email -->
                 <div>
                     <label for="email" class="block text-sm font-semibold text-slate-700 mb-1.5">Email</label>
                     <div class="relative">
@@ -268,8 +224,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all placeholder:text-slate-400 shadow-sm" />
                     </div>
                 </div>
-
-                <!-- Password -->
                 <div>
                     <label for="password" class="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
                     <div class="relative">
@@ -284,8 +238,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </button>
                     </div>
                 </div>
-
-                <!-- Remember -->
                 <div class="flex items-center justify-between text-sm">
                     <label class="inline-flex items-center gap-2 text-slate-600 cursor-pointer select-none">
                         <input type="checkbox" name="remember"
@@ -295,7 +247,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="#" class="text-primary-600 hover:text-primary-700 font-semibold">Lupa password?</a>
                 </div>
 
-                <!-- Submit -->
                 <button type="submit"
                         class="w-full inline-flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-5 py-3 rounded-xl font-semibold transition-all shadow-sm hover:shadow-glow">
                     <span class="material-symbols-outlined text-[20px]">login</span>
@@ -303,7 +254,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </button>
             </form>
 
-            <!-- Info kredensial default -->
             <div class="mt-8 p-4 bg-slate-50 border border-slate-200 rounded-xl">
                 <div class="flex items-center gap-2 mb-3">
                     <span class="material-symbols-outlined text-primary-600 text-[18px]">info</span>
@@ -343,7 +293,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script>
-    // Toggle show/hide password
     (function () {
         const btn = document.getElementById('togglePass');
         const input = document.getElementById('password');
