@@ -33,15 +33,11 @@ include "../includes/header.php";
 
 <main class="flex-1 min-w-0">
     <div class="px-5 sm:px-8 lg:px-10 py-6 lg:py-8 max-w-6xl mx-auto w-full">
-
-        <!-- Breadcrumb -->
         <nav class="flex items-center gap-2 text-sm mb-2">
             <a href="index.php" class="text-slate-500 hover:text-primary-600 font-medium transition-colors">Paket Bantuan</a>
             <span class="text-slate-300">/</span>
             <span class="text-slate-700 font-semibold">Atur Komposisi</span>
         </nav>
-
-        <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-8">
             <div>
                 <p class="text-xs font-bold text-primary-600 uppercase tracking-widest mb-1">Komposisi Item</p>
@@ -68,8 +64,6 @@ include "../includes/header.php";
         <?php endif; ?>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-            <!-- Form Tambah -->
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden lg:sticky lg:top-6">
                     <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
@@ -104,8 +98,6 @@ include "../includes/header.php";
                     </form>
                 </div>
             </div>
-
-            <!-- Tabel Komposisi -->
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden">
                     <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">

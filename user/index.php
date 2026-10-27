@@ -13,8 +13,6 @@ if (!$koneksi_db) {
 $current_page = 'user';
 $page_title   = 'Manajemen Pengguna';
 
-// Modul 'user' hanya untuk admin. require_access() akan render
-// halaman Akses Ditolak kalau koordinator/petugas mencoba masuk.
 require_access('user');
 
 include "../includes/header.php";

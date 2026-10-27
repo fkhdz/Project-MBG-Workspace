@@ -12,8 +12,6 @@ if (!$koneksi_db) {
 
 $current_page = 'mitra';
 $page_title   = 'Data Mitra';
-
-// Tentukan kemampuan CRUD user saat ini untuk modul mitra
 $mbg_can_create = can_action('mitra', 'create');
 $mbg_can_update = can_action('mitra', 'update');
 $mbg_can_delete = can_action('mitra', 'delete');
@@ -25,15 +23,11 @@ include "../includes/header.php";
 
 <main class="flex-1 min-w-0">
     <div class="px-5 sm:px-8 lg:px-10 py-6 lg:py-8 max-w-7xl mx-auto w-full">
-
-        <!-- Breadcrumb -->
         <nav class="flex items-center gap-2 text-sm mb-2">
             <a href="../index.php" class="text-slate-500 hover:text-primary-600 font-medium transition-colors">Dashboard</a>
             <span class="text-slate-300">/</span>
             <span class="text-slate-700 font-semibold">Kelola Mitra</span>
         </nav>
-
-        <!-- Page Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
                 <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Data Mitra Kerjasama</h2>
@@ -53,8 +47,6 @@ include "../includes/header.php";
                 <?php endif; ?>
             </div>
         </div>
-
-        <!-- Alerts -->
         <?php if (isset($_GET['msg'])): ?>
         <div class="mb-6">
             <?php if ($_GET['msg']==='deleted'): ?>
@@ -82,8 +74,6 @@ include "../includes/header.php";
         <?php endif; ?>
 
         <div class="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden">
-
-            <!-- Toolbar -->
             <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                 <div class="relative w-full max-w-md">
                     <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>

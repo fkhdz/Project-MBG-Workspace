@@ -116,8 +116,6 @@ include "../includes/header.php";
                 <p class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight"><?= number_format($distribusi_proses) ?></p>
             </div>
         </div>
-
-        <!-- Charts -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
                 <div class="flex items-center justify-between mb-6">
@@ -141,10 +139,7 @@ include "../includes/header.php";
                 <div class="relative flex-1 w-full flex justify-center items-center min-h-[220px]"><canvas id="chartKategori"></canvas></div>
             </div>
         </div>
-
-        <!-- Tabel Bawah -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Stok Terendah -->
             <div class="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden flex flex-col">
                 <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                     <div class="flex items-center gap-2">
@@ -199,8 +194,6 @@ include "../includes/header.php";
                     </table>
                 </div>
             </div>
-
-            <!-- Distribusi Terbaru -->
             <div class="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden flex flex-col">
                 <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                     <div class="flex items-center gap-2">
